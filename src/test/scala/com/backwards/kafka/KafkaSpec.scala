@@ -1,10 +1,8 @@
 package com.backwards.kafka
 
 import org.scalatest.{MustMatchers, WordSpec}
-import com.backwards.kafka.avro.GenericAvroSerde
-import com.lightbend.kafka.scala.streams.DefaultSerdes._
-import com.lightbend.kafka.scala.streams.ImplicitConversions._
 import com.lightbend.kafka.scala.streams.StreamsBuilderS
+import com.backwards.kafka.avro.Implicits._
 
 /**
   * Topic: key -> value or more specifically Array[Byte] -> Array[Byte]
@@ -31,10 +29,6 @@ class KafkaSpec extends WordSpec with MustMatchers {
   def toBytes(xs: (Array[Int], Array[Int])): (Array[Byte], Array[Byte]) = xs._1.map(_.toByte) -> xs._2.map(_.toByte)
 
   case class MyMessage()
-
-  object MyMessage {
-    implicit val serde: GenericAvroSerde[MyMessage] = GenericAvroSerde[MyMessage]
-  }
 
   "" should {
     "" in {
