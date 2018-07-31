@@ -52,11 +52,12 @@ class KafkaSpec extends WordSpec with MustMatchers {
 
       // In Kafka Streams you read a topic into a KStream via StreamsBuilder#stream().
       // Here, you must define the desired schema via the Consumed.with() parameter for reading the topic’s data:
+      // StreamsBuilder builder = new StreamsBuilder();
+      // KStream<String, String> stream = builder.stream("input-topic", Consumed.with(Serdes.String(), Serdes.String()));
       val builder = new StreamsBuilderS
 
-      val transactionStream = builder
+      val myMessageStream = builder
         .stream[String, MyMessage]("my-topic")
-
 
       // Now read the same topic into a table.
       // First, we need to add schema information (schema-on-read).
@@ -79,6 +80,21 @@ class KafkaSpec extends WordSpec with MustMatchers {
       val tableFromStream = stream
         .groupBy(_._1)
         .map { case (k, v) => (k, v.reduceLeft((aggV, newV) => newV)._2) }
+
+      // In Kafka Streams you’d normally use StreamsBuilder#table() to read a Kafka topic into a KTable with a simple 1-liner:
+      // KTable<String, String> table = builder.table("input-topic", Consumed.with(Serdes.String(), Serdes.String()));
+
+      val myMessageTable = builder.table[String, MyMessage]("my-other-topic")
+      // If we had used "my-topic" again, we would get the error:
+      // org.apache.kafka.streams.errors.TopologyException: Invalid topology: Topic my-topic has already been registered by another source.
+
+      // But, for the sake of illustration, you can also read the topic into a KStream first, and then perform the same aggregation step as shown above explicitly to turn the KStream into a KTable.
+      // KStream<String, String> stream = ...;
+      // KTable<String, String> table = stream
+      //                                .groupByKey()
+      //                                .reduce((aggV, newV) -> newV);
+
+      // In summary - a table is actually an aggregated stream.
     }
   }
 }
