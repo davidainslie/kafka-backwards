@@ -16,6 +16,7 @@ import com.twitter.bijection.avro.GenericAvroCodecs
 object Implicits extends ImplicitConversions with DefaultSerdes {
   implicit def serde[T: ClassTag: SchemaFor: ToRecord: FromRecord]: Serde[T] = new Implicits[T]
 
+  // TODO - Shapeless version
   class Implicits[T: ClassTag: SchemaFor: ToRecord: FromRecord] extends Serde[T] {
     val schema: Schema = AvroSchema[T]
 

@@ -1,6 +1,5 @@
 import java.io.File
 import com.scalapenos.sbt.prompt.SbtPrompt.autoImport._
-import ReleaseTransformations._
 
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
 addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.7")
@@ -11,7 +10,7 @@ organization := "backwards"
 
 scalaVersion := "2.12.6"
 
-sbtVersion := "1.1.6"
+sbtVersion := "1.2.0"
 
 scalacOptions ++= Seq(
   "-unchecked",
@@ -186,11 +185,8 @@ lazy val acceptanceSettings =
       scalaSource in Acceptance := baseDirectory.value / "src/acceptance/scala"
     )
 
-lazy val testAll = TaskKey[Unit]("test-all")
-
-lazy val root = Project("kafka-backwards", file(".")).enablePlugins(GatlingPlugin, DockerPlugin, DockerComposePlugin)
+lazy val root = Project("kafka-backwards", file(".")).enablePlugins(ClassDiagramPlugin, GatlingPlugin, DockerPlugin, DockerComposePlugin)
   .configs(IT, IntegrationTest, GatlingIt, Acceptance)
   .settings(itSettings)
   .settings(acceptanceSettings)
-  .settings(testAll := (test in Acceptance).dependsOn((test in IT).dependsOn(test in Test)))
   .settings(javaOptions in Test ++= Seq("-Dconfig.resource=application.test.conf"))
